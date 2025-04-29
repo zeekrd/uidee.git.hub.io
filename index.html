@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Интерактивные карточки</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #8E2DE2, #FF6EC4);
+      color: #fff;
+    }
+    header {
+      padding: 20px;
+      text-align: center;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .subject-btn {
+      background-color: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .subject-btn.active,
+    .subject-btn:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
+    .flashcards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+    .card {
+      background-color: rgba(0, 0, 0, 0.3);
+      width: 300px;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    .counter {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+    .bot-link {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.2);
+      padding: 10px 15px;
+      border-radius: 10px;
+      color: white;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+    .bot-link:hover {
+      background: rgba(255,255,255,0.4);
+    }
+  </style>
+</head>
+<body>
+  <a href="https://t.me/onAIuide_bot" class="bot-link" target="_blank">Наш чат бот</a>
+  <header>
+    <h1>Образовательные карточки</h1>
+  </header>
+  <nav>
+    <button class="subject-btn" onclick="selectSubject('math', this)">Математика</button>
+    <button class="subject-btn" onclick="selectSubject('physics', this)">Физика</button>
+    <button class="subject-btn" onclick="selectSubject('biology', this)">Биология</button>
+  </nav>
+  <div class="counter">Вопрос <span id="current">1</span> из <span id="total">10</span></div>
+  <div class="flashcards" id="cards"></div>
+
+  <script>
+    const subjects = {
+      math: [
+        { q: 'Что такое производная функции?', a: 'Предел отношения приращения функции к приращению аргумента', e: 'Производная показывает скорость изменения функции в данной точке.' },
+        { q: 'Чему равен синус 90 градусов?', a: '1', e: 'Это значение синуса в вершине прямого угла.' },
+        { q: 'Что такое логарифм?', a: 'Степень, в которую надо возвести основание, чтобы получить число', e: 'logₐ(b) = x означает aˣ = b.' },
+        { q: 'Что такое интеграл?', a: 'Обратная операция к производной', e: 'Используется для нахождения площадей и объёмов.' },
+        { q: 'Чему равна сумма углов треугольника?', a: '180 градусов', e: 'Это свойство всех плоских треугольников.' },
+        { q: 'Что такое уравнение?', a: 'Равенство с переменной', e: 'Уравнение описывает связь между неизвестными величинами.' },
+        { q: 'Что такое гипотенуза?', a: 'Самая длинная сторона прямоугольного треугольника', e: 'Напротив прямого угла.' },
+        { q: 'Формула площади круга?', a: 'πr²', e: 'Где r — радиус круга.' },
+        { q: 'Что такое натуральные числа?', a: '1, 2, 3, 4, ...', e: 'Числа, используемые для счёта.' },
+        { q: 'Что такое дробь?', a: 'Часть целого', e: 'Представляется как a/b, где a — числитель, b — знаменатель.' }
+      ],
+      physics: [
+        { q: 'Что такое сила?', a: 'Величина, вызывающая ускорение', e: 'По второму закону Ньютона F = ma.' },
+        { q: 'Что такое масса?', a: 'Количество вещества в теле', e: 'Не зависит от гравитации, в отличие от веса.' },
+        { q: 'Скорость света в вакууме?', a: '300 000 км/с', e: 'Точная величина — 299 792 458 м/с.' },
+        { q: 'Что такое работа в физике?', a: 'Произведение силы на путь', e: 'W = F × s × cos(θ)' },
+        { q: 'Какой прибор измеряет силу тока?', a: 'Амперметр', e: 'Подключается последовательно в цепь.' },
+        { q: 'Что такое энергия?', a: 'Способность выполнять работу', e: 'Может быть кинетической, потенциальной и т.д.' },
+        { q: 'Закон сохранения энергии?', a: 'Энергия не создаётся и не исчезает', e: 'Только переходит из одной формы в другую.' },
+        { q: 'Что такое импульс?', a: 'Произведение массы на скорость', e: 'p = mv' },
+        { q: 'Что измеряет термометр?', a: 'Температуру', e: 'В градусах Цельсия, Кельвина и т.п.' },
+        { q: 'Что такое сопротивление?', a: 'Препятствие току в цепи', e: 'Обозначается R, измеряется в Ом.' }
+      ],
+      biology: [
+        { q: 'Что такое клетка?', a: 'Основная единица жизни', e: 'Все живые организмы состоят из клеток.' },
+        { q: 'Где содержится ДНК?', a: 'В ядре клетки', e: 'Она несёт генетическую информацию.' },
+        { q: 'Что такое фотосинтез?', a: 'Процесс преобразования света в энергию', e: 'У растений в хлоропластах.' },
+        { q: 'Какой орган отвечает за перекачивание крови?', a: 'Сердце', e: 'Центральный орган кровеносной системы.' },
+        { q: 'Что делает иммунная система?', a: 'Защищает организм от болезней', e: 'Включает лейкоциты, лимфоциты и антитела.' },
+        { q: 'Что такое митоз?', a: 'Деление клетки', e: 'При котором образуются две идентичные клетки.' },
+        { q: 'Какой орган отвечает за дыхание?', a: 'Лёгкие', e: 'Обеспечивают газообмен.' },
+        { q: 'Что такое мутация?', a: 'Изменение в ДНК', e: 'Может быть полезной, вредной или нейтральной.' },
+        { q: 'Что такое белок?', a: 'Молекула из аминокислот', e: 'Строительный материал клеток.' },
+        { q: 'Как передаются наследственные признаки?', a: 'Через гены', e: 'Гены — участки ДНК, передающиеся от родителей.' }
+      ]
+    };
+
+    let currentSubject = 'math';
+
+    function selectSubject(subject, btn) {
+      currentSubject = subject;
+      document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderCards();
+    }
+
+    function renderCards() {
+      const cardContainer = document.getElementById('cards');
+      const counter = document.getElementById('current');
+      const total = document.getElementById('total');
+      cardContainer.innerHTML = '';
+
+      const cards = subjects[currentSubject];
+      total.innerText = cards.length;
+      cards.forEach((card, index) => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `<h3>${card.q}</h3><p><strong>Ответ:</strong> ${card.a}</p><p><em>${card.e}</em></p>`;
+        cardContainer.appendChild(div);
+      });
+      counter.innerText = 1;
+    }
+
+    window.onload = () => {
+      renderCards();
+      document.querySelector('.subject-btn').classList.add('active');
+    };
+  </script>
+</body>
+</html>
