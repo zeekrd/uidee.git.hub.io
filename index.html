@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Интерактивные карточки</title>
+  <title>onai.uide</title>
   <style>
     body {
       margin: 0;
@@ -101,15 +101,14 @@
 <body>
   <a href="https://onaiuide-bot.tg.pulse.is/" class="bot-link" target="_blank">Наш чат бот</a>
   <header>
-    <h1>Образовательные карточки</h1>
+    <h1>Флэш карточки от onAI (uide)</h1>
   </header>
   <nav>
     <button class="subject-btn" onclick="selectSubject('math', this)">Математика</button>
     <button class="subject-btn" onclick="selectSubject('physics', this)">Физика</button>
     <button class="subject-btn" onclick="selectSubject('biology', this)">Биология</button>
   </nav>
-  <div class="counter">Вопрос <span id="current">1</span> из <span id="total">10</span></div>
-  <div class="flashcards" id="cards"></div>
+  
 
   <script>
     const subjects = {
